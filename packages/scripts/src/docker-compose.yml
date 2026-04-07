@@ -11,8 +11,12 @@ services:
       - NODE_ENV=development
       - AWS_ENDPOINT=http://localstack:4566
       - NODE_OPTIONS=--max-old-space-size=8192
+      - CHOKIDAR_USEPOLLING=1
     env_file:
-      - ../../server/.env_EXAMPLE
+      - path: ../../server/.env_EXAMPLE
+        required: true
+      - path: ../../server/.env
+        required: false
     ports:
       # Webpack / browser entry point
       - 8080:8080

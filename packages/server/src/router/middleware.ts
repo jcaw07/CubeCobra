@@ -108,24 +108,26 @@ export async function recaptcha(req: Request, res: Response, next: NextFunction)
     return redirect(req, res, '/');
   }
 
-  if (!captcha) {
-    req.flash('danger', 'Please complete the reCAPTCHA');
-    return redirect(req, res, '/');
-  }
+  if (process.env.NODE_ENV !== 'development') {
+    if (!captcha) {
+      req.flash('danger', 'Please complete the reCAPTCHA');
+      return redirect(req, res, '/');
+    }
 
-  const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: `secret=${process.env.CAPTCHA_SECRET_KEY}&response=${captcha}`,
-  });
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${process.env.CAPTCHA_SECRET_KEY}&response=${captcha}`,
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!data.success) {
-    req.flash('danger', 'Failed reCAPTCHA verification');
-    return redirect(req, res, '/');
+    if (!data.success) {
+      req.flash('danger', 'Failed reCAPTCHA verification');
+      return redirect(req, res, '/');
+    }
   }
 
   next();
@@ -174,3 +176,4 @@ export const bodyValidation =
     }
     next();
   };
+ 
